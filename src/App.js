@@ -9,23 +9,9 @@ function App() {
   // const [error, setError] = useState(null);
   const [tasks, setTasks] = useState([]);
 
-  const transformTasks = (tasksObj) => {
-    const loadedTasks = [];
-
-    for (const taskKey in tasksObj) {
-      loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
-    }
-
-    setTasks(loadedTasks);
-  };
-
-  const { isLoading, error, sendRequest: fetchTasks } = useHttp(
-    {
-      url: "https://customhook-practice-default-rtdb.firebaseio.com/tasks.json",
-    },
-    transformTasks
-  );
-
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp();
+  
+  // use-http 컴포넌트로 이동 후 사용자정의훅으로 구성
   // const fetchTasks = async (taskText) => {
   //   setIsLoading(true);
   //   setError(null);
@@ -54,8 +40,22 @@ function App() {
   // };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    const transformTasks = (tasksObj) => {
+      const loadedTasks = [];
+
+      for (const taskKey in tasksObj) {
+        loadedTasks.push({ id: taskKey, text: tasksObj[taskKey].text });
+      }
+
+      setTasks(loadedTasks);
+    };
+    fetchTasks(
+      {
+        url: "https://customhook-practice-default-rtdb.firebaseio.com/tasks.json",
+      },
+      transformTasks
+    );
+  }, [fetchTasks]);
 
   const taskAddHandler = (task) => {
     setTasks((prevTasks) => prevTasks.concat(task));
